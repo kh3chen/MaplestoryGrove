@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Grove Announcement Formatter</title>
+</head>
+<body>
+    <h1>Grove Announcement Formatter</h1>
+    <label for="date">Select the date:</label><br>
+    <input type="date" id="date"><br>
+
+    <label for="newMembers">Enter new member Discord IDs:</label><br>
+    <textarea id="newMembers" rows="3" cols="50" placeholder="<@123>&#10;<@456>&#10;<@789>"></textarea><br>
+
+    <label for="memberParticipation">Enter weekly member participation, sorted by most to least and alphabetically:</label><br>
+    <textarea id="memberParticipation" rows="5" cols="50" placeholder="3&#9;<@123>&#10;2&#9;<@456>&#10;1&#9;<@789>"></textarea><br>
+
+    <label for="customAnnouncement">Enter any custom announcement:</label><br>
+    <textarea id="customAnnouncement" rows="5" cols="50" placeholder="Enter your custom announcement here"></textarea><br>
+
+    <button onclick="formatAndDisplay()">Format</button>
+
+    <h2>Announcement:</h2>
+    <pre id="announcementBox"></pre>
+
+    <h2>Leaderboard:</h2>
+    <pre id="leaderboardBox"></pre>
+
+    <script>
+        function getLastSunday(date) {
+            const dayOfWeek = date.getDay();
+            date.setHours(0, 0, 0, 0);
+            date.setDate(date.getDate() - dayOfWeek);
+            return date;
+        }
+
+        function getWeeksSinceBaseDate(date) {
+            const baseDate = new Date('2021-12-19');
+            const diffInMilliseconds = date - baseDate;
+            const diffInWeeks = diffInMilliseconds / (1000 * 60 * 60 * 24 * 7);
+            return Math.floor(diffInWeeks);
+        }
+
+        function getWeeksSinceYearStart(date) {
+            const year = date.getFullYear() - 1; // Subtract one year from the selected date
+            const yearStart = new Date(year + "-12-31"); // Last day of the previous year
+            const diffInMilliseconds = date - yearStart;
+            const diffInWeeks = diffInMilliseconds / (1000 * 60 * 60 * 24 * 7);
+            return Math.ceil(diffInWeeks);
+        }
+
+        function formatAndDisplay() {
+            const today = new Date(new Date().toISOString().split('T')[0]);
+            const dateElement = document.getElementById('date');
+            const dateValue = dateElement.value ? new Date(dateElement.value) : today;
+            const yearOfDate = dateValue.getFullYear();
+            const newMembers = document.getElementById('newMembers').value;
+            const input = document.getElementById('memberParticipation').value;
+            const lines = input.split('\n');
+            let leaderboardOutput = '';
+            let announcementOutput = '';
+            let prevNum = null;
+            lines.sort((a, b) => {
+                const [numA] = a.split('\t');
+                const [numB] = b.split('\t');
+                return numB - numA;
+            });
+            for (const line of lines) {
+                const [num, id] = line.split('\t');
+                if (num !== prevNum) {
+                    if (prevNum !== null) {
+                        leaderboardOutput += '\n';
+                    }
+                    leaderboardOutput += `${num} `;
+                }
+                leaderboardOutput += `${id} `;
+                prevNum = num;
+            }
+            leaderboardOutput = `**${yearOfDate} Culvert & Flag Race Leaderboard**\n${leaderboardOutput}\n\nIf you notice an error or have any questions or feedback, please let a <@&918725961061658656> know. Thank you!`;
+
+            announcementOutput = `<@&922334019146899566>\nThanks everyone for another great week of Grove! Here's our week ${getWeeksSinceBaseDate(dateValue)} recap:\n<#LEADERBOARD_THREAD_ID_HERE>\n\n`;
+            if (newMembers) {
+                const newMembersArray = newMembers.trim().split('\n');
+                announcementOutput += newMembersArray.length > 1 ? "Welcome to our new members this week:\n" : "Welcome to our new member this week:\n";
+                announcementOutput += newMembers.trim() + "\n";
+            }
+            if (document.getElementById('customAnnouncement').value.trim()) {
+                announcementOutput += "\n" + document.getElementById('customAnnouncement').value.trim() + "\n\n";
+            }
+            announcementOutput += "Happy Mapling, Go Grove! :grove:";
+
+            document.getElementById('leaderboardBox').innerText = leaderboardOutput.trim();
+            document.getElementById('announcementBox').innerText = announcementOutput.trim();
+        }
+
+        // Set the default value of the date picker to the most recent Sunday at 00:00
+        const today = new Date(new Date().toISOString().split('T')[0]);
+        const lastSunday = getLastSunday(today);
+        document.getElementById('date').value = lastSunday.toISOString().split('T')[0];
+    </script>
+</body>
+</html>
