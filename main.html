@@ -77,14 +77,14 @@
             }
             leaderboardOutput = `**${yearOfDate} Culvert & Flag Race Leaderboard**\n${leaderboardOutput}\n\nIf you notice an error or have any questions or feedback, please let a <@&918725961061658656> know. Thank you!`;
 
-            announcementOutput = `<@&922334019146899566>\nThanks everyone for another great week of Grove! Here's our week ${getWeeksSinceBaseDate(dateValue)} recap:\n<#LEADERBOARD_THREAD_ID_HERE>\n\n`;
+            announcementOutput = `<@&922334019146899566>\n\nThanks everyone for another great week of Grove! Here's our week ${getWeeksSinceBaseDate(dateValue)} recap:\n<#LEADERBOARD_THREAD_ID_HERE>\n\n`;
             if (newMembers) {
                 const newMembersArray = newMembers.trim().split('\n');
                 announcementOutput += newMembersArray.length > 1 ? "Welcome to our new members this week:\n" : "Welcome to our new member this week:\n";
-                announcementOutput += newMembers.trim() + "\n";
+                announcementOutput += newMembers.trim() + "\n\n";
             }
             if (document.getElementById('customAnnouncement').value.trim()) {
-                announcementOutput += "\n" + document.getElementById('customAnnouncement').value.trim() + "\n\n";
+                announcementOutput += document.getElementById('customAnnouncement').value.trim() + "\n\n";
             }
             announcementOutput += "Happy Mapling, Go Grove! :grove:";
 
