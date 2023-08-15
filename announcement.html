@@ -6,24 +6,28 @@
 <body>
     <h1>Grove Announcement Formatter</h1>
     <label for="date">Select the date:</label><br>
-    <input type="date" id="date"><br>
+    <input type="date" id="date"><br><br>
 
     <label for="newMembers">Enter new member Discord IDs:</label><br>
-    <textarea id="newMembers" rows="3" cols="50" placeholder="<@123>&#10;<@456>&#10;<@789>"></textarea><br>
+    <textarea id="newMembers" rows="3" cols="50" placeholder="<@123>&#10;<@456>&#10;<@789>"></textarea><br><br>
 
     <label for="memberParticipation">Enter weekly member participation, sorted by most to least and alphabetically:</label><br>
-    <textarea id="memberParticipation" rows="5" cols="50" placeholder="3&#9;<@123>&#10;2&#9;<@456>&#10;1&#9;<@789>"></textarea><br>
+    <textarea id="memberParticipation" rows="5" cols="50" placeholder="3&#9;<@123>&#10;2&#9;<@456>&#10;1&#9;<@789>"></textarea><br><br>
 
     <label for="customAnnouncement">Enter any custom announcement:</label><br>
-    <textarea id="customAnnouncement" rows="5" cols="50" placeholder="Enter your custom announcement here"></textarea><br>
+    <textarea id="customAnnouncement" rows="5" cols="50" placeholder="Enter your custom announcement here"></textarea><br><br>
 
-    <button onclick="formatAndDisplay()">Format</button>
+    <button onclick="formatAndDisplay()">Format</button><br><br>
+
+    <hr>
 
     <h2>Announcement:</h2>
     <pre id="announcementBox"></pre>
+    <hr>
 
     <h2>Leaderboard:</h2>
-    <pre id="leaderboardBox"></pre>
+    <h4 id="leaderboardNameBox"></h4>
+    <pre id="leaderboardMessageBox"></pre>
 
     <script>
         function getLastSunday(date) {
@@ -53,10 +57,11 @@
             const dateElement = document.getElementById('date');
             const dateValue = dateElement.value ? new Date(dateElement.value) : today;
             const yearOfDate = dateValue.getFullYear();
+            const weekOfYear = getWeeksSinceYearStart(dateValue);
             const newMembers = document.getElementById('newMembers').value;
             const input = document.getElementById('memberParticipation').value;
             const lines = input.split('\n');
-            let leaderboardOutput = '';
+            let leaderboardMessageOutput = '';
             let announcementOutput = '';
             let prevNum = null;
             lines.sort((a, b) => {
@@ -68,14 +73,15 @@
                 const [num, id] = line.split('\t');
                 if (num !== prevNum) {
                     if (prevNum !== null) {
-                        leaderboardOutput += '\n';
+                        leaderboardMessageOutput += '\n';
                     }
-                    leaderboardOutput += `${num} `;
+                    leaderboardMessageOutput += `${num} `;
                 }
-                leaderboardOutput += `${id} `;
+                leaderboardMessageOutput += `${id} `;
                 prevNum = num;
             }
-            leaderboardOutput = `**${yearOfDate} Culvert & Flag Race Leaderboard**\n${leaderboardOutput}\n\nIf you notice an error or have any questions or feedback, please let a <@&918725961061658656> know. Thank you!`;
+            leaderboardTitleOutput = `${yearOfDate} Culvert & Flag Race Leaderboard - Week ${weekOfYear}`;
+            leaderboardMessageOutput = `**${leaderboardTitleOutput}**\n${leaderboardMessageOutput}\n\nIf you notice an error or have any questions or feedback, please let a <@&918725961061658656> know. Thank you!`;
 
             announcementOutput = `<@&922334019146899566>\n\nThanks everyone for another great week of Grove! Here's our week ${getWeeksSinceBaseDate(dateValue)} recap:\n<#LEADERBOARD_THREAD_ID_HERE>\n\n`;
             if (newMembers) {
@@ -88,8 +94,9 @@
             }
             announcementOutput += "Happy Mapling, Go Grove! :grove:";
 
-            document.getElementById('leaderboardBox').innerText = leaderboardOutput.trim();
             document.getElementById('announcementBox').innerText = announcementOutput.trim();
+            document.getElementById('leaderboardNameBox').innerText = leaderboardTitleOutput.trim();
+            document.getElementById('leaderboardMessageBox').innerText = leaderboardMessageOutput.trim();
         }
 
         // Set the default value of the date picker to the most recent Sunday at 00:00
